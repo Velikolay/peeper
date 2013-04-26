@@ -1,22 +1,22 @@
-sentimention
+Peeper
 ============
 
-Infromation retrieval course 2013
+Part of infromation retrieval course 2013
 
-Sentimation is a web application that enables monitoring of keywords and phrases in social network sites.
-It allow you to keep close look on topics that you are interested in, identify activity trends in real-time and get understanding about the emotions.
+Peeper is a web application that enables monitoring of keywords and phrases in social network sites.
+It allow you to keep close look on topics, brands, products, people and event that you are interested in, identify activity trends in real-time and get understanding about the overall emotions.
 
-Developer`s guide:
+## Developer`s guide:
 1. Install nodejs & npm
 2. Checkout the git repository
 3. In the project`s root folder execute nmp install
-4. Install and run MongoDB "mongod --dbpath <path_to_the_data_folder> --setParameter textSearchEnabled=true"
+4. Install and run MongoDB ```mongod --dbpath <path_to_the_data_folder> --setParameter textSearchEnabled=true"```
 5. Create "dev" database
-6. Add twitter credentials in <proj_root>/cfg/serviceCfg.js
+6. Add twitter credentials in ```./cfg/serviceCfg.js```
 7. (optional)Install and run the sentiment analysis service - Contact Me
-8. Start the application "node <proj_root>/app.js"
+8. Start the application ```node <proj_root>/app.js```
 
-Current project status:
+## Current project status:
 1. The application constantly retrieves tweets(using Twitter Streaming API) related to a give set of phrases.
 2. You can add new phrases to be monitored as well as get rid of unwanted ones.
 3. The retrieved tweets get evaluated by sentiment analysis service and then stored in the database, together with the sentiment meta-data.
