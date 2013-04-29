@@ -20,6 +20,14 @@ It allow you to keep close look on topics, brands, products, people and event th
 1. The application constantly retrieves tweets(using Twitter Streaming API) related to a give set of phrases.
 2. You can add new phrases to be monitored as well as get rid of unwanted ones.
 3. The retrieved tweets get evaluated by sentiment analysis service and then stored in the database, together with the sentiment meta-data.
-4. Then you can query any of the monitored phrases and they will show up in your browser.
-5. The interaction with the application happens through REST and there is absolutely no UI, so use generic REST Client to request it.
-6. Everything else is missing :D
+4. One can query any of the monitored phrases and the related results will show up in the browser.
+5. When new relevant results are kept by the server it automatically pushes them to the client(e.g. websocket integration for real-time feeling) 
+6. There is a client with quite lame user interface, which was so far used only for the sake of testing. EJS module is integrated on the client-side for building HTML from templates
+
+## TODO
+1. Improve server-side logic for handling monitoring requests. 
+2. Create fancy user interface
+3. Eventually add the ability to monitor multiple phrases simultaneously
+4. Enable monitoring of urls
+5. Integrate with other social medias twitter
+6. More...
