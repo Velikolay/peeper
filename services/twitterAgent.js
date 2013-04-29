@@ -1,72 +1,85 @@
 var twitter = require('ntwitter'),
-	Tweet = require('../models/tweet'),
+	tweetModel = require('../models/tweetModel'),
+	phraseModel = require('../models/phraseModel'),
 	sentiment = require('./sentimentService'),
 	TWITTER_CREDENETIALS = require('../cfg/serviceCfg').TWITTER_CREDENETIALS;
 
-module.exports = new function() {
-	this.ntwitter = new twitter({
+var ntwitter = new twitter({
 		consumer_key: TWITTER_CREDENETIALS.consumer_key,
 		consumer_secret: TWITTER_CREDENETIALS.consumer_secret,
 		access_token_key: TWITTER_CREDENETIALS.access_token_key,
 		access_token_secret: TWITTER_CREDENETIALS.access_token_secret
-	});
-	this.trackList = [];
+});
 
-	this.track = function(keyPhrase, enable) {
-		var index = this.trackList.indexOf(keyPhrase);
-		if(enable && index==-1) {
-			this.trackList.push(keyPhrase);
-		} else if(!enable && index!=-1) {
-			this.trackList.splice(index, 1);
-		} else {
-			return false;
+module.exports.init = function() {
+	phraseModel.find({}, 'actual', function(err, data) {
+		if(err) {
+			console.error(err);
+			process.exit(1);
 		}
-		var listLen = this.trackList.length;
-		console.log("Refreshing the track list! The new list contains " + listLen + " phrases " + this.trackList);
-		this.ntwitter.stream('statuses/filter', { 'track': this.trackList, 'filter_level': 'medium', 'language': 'en' }, function(stream) {
+		if(data.length == 0) {
+			console.info("Nothing to be tracked");
+			return;
+		}
 		
-			if(listLen == 0) {
-				// TODO it doesn seem to work? :(
-				stream.destroy();
+		var trackList = function(data) {
+			var trackList=[];
+			for(var i=0; i<data.length; i++) {
+				trackList.push(data[i].actual);
 			}
+			return trackList;
+		}
+		
+		track(trackList(data));
+	});
+}
 
-			stream.on('data', function (data) {
-				if (typeof data.id == 'undefined') {
-					console.log("undefined data recieved");
-					return;
+module.exports.track = track = function(trackList) {
+	console.info("Refreshing the track list! The list contains: " + trackList);
+	ntwitter.stream('statuses/filter', { 'track': trackList, 'filter_level': 'medium', 'language': 'en' }, function(stream) {
+		
+		if(trackList.length == 0) {
+			// TODO it doesn`t seem to work :( I guess the damn API doesn`t fire the 'end' event.
+			console.log("destroying stream");
+			stream.destroy();
+		}
+		
+		stream.on('data', function (data) {
+			if (typeof data.id == 'undefined') {
+				console.log("undefined data recieved");
+				return;
+			}
+			
+			sentiment.evalText(data.text, function (err, res) {
+				var obj = { _id: data.id, text: data.text, user: data.user.screen_name, created_at: data.created_at, sentiment: {} };
+				
+				if(err) {
+					console.error(err);
+				} else {
+					obj.sentiment.positive = res.positive;
+					obj.sentiment.negative = res.negative;
+					obj.sentiment.polarity = res.polarity;
 				}
-				
-				sentiment.evalText(data.text, function (err, res) {
-				
-					var obj = { _id: data.id, text: data.text, user: data.user.screen_name, created_at: data.created_at };
-					
-					if(err) {
-						console.error(err);
-					} else {
-						obj.pos_sentiment = res.pos_sentiment;
-						obj.neg_sentiment = res.neg_sentiment;
-						obj.sentiment_polarity = res.sentiment_polarity;
-					}
-					var tweet = new Tweet(obj);
-					tweet.save(function (err) {
-	  					if (err) console.error(err);
-	  					console.log(tweet);
-					});
+				var tweet = new tweetModel(obj);
+				tweet.save(function (err) {
+					if (err) console.error(err);
+					//console.log(tweet);
 				});
 			});
-
-			stream.on('error', function (error) {
-				console.log(error);
-			});
-			
-			stream.on('end', function (response) {
-				// Handle a disconnection
-			});
-
-			stream.on('destroy', function (response) {
-				// Handle a 'silent' disconnection from Twitter, no end/error event fired
-			});
 		});
-		return true;
-	}
+		
+		stream.on('error', function (error) {
+			console.log(error);
+		});
+		
+		stream.on('end', function (response) {
+			// Handle a disconnection
+			console.log(response);
+		});
+		
+		stream.on('destroy', function (response) {
+			// Handle a 'silent' disconnection from Twitter, no end/error event fired
+			console.log(response);
+		});
+	});
 }

@@ -6,11 +6,10 @@
     "start": "node app"
   },
   "dependencies": {
-    "express": "3.0.6",
-    "jade": "*",
+    "express.io": "*",
+    "ejs": "*"
     "ntwitter": "*",
     "mongoose":"*",
-    "mongoose-text-search":"*",
-    "request":"*"
+    "mongoose-text-search":"*"
   }
 }

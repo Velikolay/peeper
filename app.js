@@ -3,47 +3,64 @@
  * Module dependencies.
  */
 
-var express = require('express')
-  , routes = require('./routes')
-  , user = require('./routes/user')
-  , http = require('http')
-  , path = require('path')
-  , mongoose = require('mongoose')
-  , phrase = require('./routes/phrase');
+var expressio = require('express.io')
+	,routes = require('./routes')
+	,http = require('http')
+	,path = require('path')
+	,mongoose = require('mongoose')
+	,twitterAgent = require('./services/twitterAgent')
+	,observerService = require('./services/observerService')
+	,phrases = require('./routes/phrases')
+	,search = require('./routes/search');
 
 mongoose.connect("mongodb://localhost/dev");
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
-  console.log("successful connection");
+	console.info("DB connection successfull!");
+	twitterAgent.init();
+	observerService.start();
 });
 
-var app = express();
+var app = expressio();
+app.http().io();
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.favicon());
-  app.use(express.logger('dev'));
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
+  app.set('view engine', 'ejs');
+  app.use(expressio.favicon());
+  app.use(expressio.logger('dev'));
+  app.use(expressio.bodyParser());
+  app.use(expressio.methodOverride());
   app.use(app.router);
-  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(expressio.static(path.join(__dirname, 'public')));
 });
 
 app.configure('development', function(){
-  app.use(express.errorHandler());
+  app.use(expressio.errorHandler());
 });
 
-//app.get('/', routes.index);
-//app.get('/users', user.list);
-app.post('/phrases', phrase.track);
-app.del('/phrases/:phrase', phrase.untrack)
-app.get('/phrases', phrase.search);
-app.get('/phrases/:phrase', phrase.search);
+app.io.route('track', function(req) {
+	trackList = req.data.trackList;
+	for(var i=0; i<trackList.length; i++) {
+		var phrase = trackList[i];
+		console.log("Looking for " + phrase);
+		observerService.notifyFor(phrase, function(data) {
+			// store data in the user session in order to offload the observerService
+			// from obsolate phrases when the user disconnects or no longer monitors them.
+			console.log("new tweets received for " + phrase);
+			req.io.emit('update', {phrase: phrase, results: data});
+		});
+	}
+});
+app.get('/', routes.index);
+app.post('/phrases', phrases.track);
+app.del('/phrases/:phrase', phrases.untrack);
+app.get('/search', search.search);
 
-http.createServer(app).listen(app.get('port'), function(){
+app.listen(3000);
+/*http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
-});
+});*/
