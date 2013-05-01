@@ -7,8 +7,8 @@
   },
   "dependencies": {
     "express.io": "*",
-    "ejs": "*"
-    "ntwitter": "*",
+    "ejs": "*",
+    "ntwitter" : "*",
     "mongoose":"*",
     "mongoose-text-search":"*"
   }

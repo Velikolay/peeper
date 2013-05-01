@@ -3,39 +3,60 @@
 <head>
 	<meta charset="utf-8">
 	<title>Welcome to peeper</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="stylesheets/bootstrap.min.css" rel="stylesheet" media="screen">
+	<link href="stylesheets/style.css" rel="stylesheet" media="screen">
 </head>
 <body>
-	<form name="input" action="search" method="get">
-		<input type="search" placeholder="Search" name="phrase">
-		<input type="submit" value="Search">
-	</form>
-	
-	<table id="resultsTable" border="1">
-	<% if(data.results && data.results.length > 0) { 
-		var results = data.results;	%>
-		
-		<%	for(var i=0; i<results.length; i++) { %>
-			<tr>
-				<td> <%= results[i].obj.text %> </td>
-			</tr>
-		<% } %>
-		
-	<% } %>
-	</table>
-	<% if(trackList) { %>
-		<script src="/socket.io/socket.io.js"></script>
-		<script>
-			io = io.connect();
-			io.emit('track', {trackList: <%- trackList %>});
-			io.on('update', function(data) {
-				var results = data.results;
-				for(var i=0; i<results.length; i++) {
-					var table = document.getElementById('resultsTable');
-					var cell = table.insertRow(0).insertCell(0);
-					cell.innerHTML = results[i].obj.text;
-				}
-			});
-	<% } %>
-	</script>
+	<script src="http://code.jquery.com/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<div class="container">
+		<div class="span12 marginTop20">
+			<div class="span12 text-center">
+				<form name="input" action="search" method="get" class="form-search">
+					<input type="search" placeholder="Search" name="phrase" class="input-medium">
+					<input type="submit" value="Search" class="btn">
+				</form>
+			</div>
+
+			<div id="tweets" class="span12">
+			<% if(data.results && data.results.length > 0) { 
+				var results = data.results;	%>
+				
+				<%	for(var i=0; i<results.length; i++) { %>
+					<blockquote>
+						<p><%= results[i].obj.text %></p>
+						<small><strong><%= results[i].obj.user %></strong> @ <%= results[i].obj.created_at %></small>
+						<div class="progress">
+  							<div class="bar" style="width: <%= results[i].score * 100 %>%;"></div>
+						</div>
+					</blockquote>
+				<% } %>
+				
+			<% } %>
+			</div>
+			<% if(trackList) { %>
+				<script src="/socket.io/socket.io.js"></script>
+				<script>
+					io = io.connect();
+					io.emit('track', {trackList: <%- trackList %>});
+					io.on('update', function(data) {
+						var results = data.results;
+						for(var i=0; i<results.length; i++) {
+							console.log(results[i]);
+							$('#tweets').prepend('<blockquote><p>' + results[i].obj.text + 
+								'</p><small><strong>' + results[i].obj.user + '</strong> @ ' + results[i].obj.created_at + 
+								'</small><div class="progress"><div class="bar" style="width: ' + results[i].score * 100 + 
+								'%;"></div></div></blockquote>');
+							// var table = document.getElementById('resultsTable');
+							// var cell = table.insertRow(0).insertCell(0);
+							// cell.innerHTML = results[i].obj.text;
+							// console.log(results[i]);
+						}
+					});
+			<% } %>
+			</script>
+		</div>
+	</div>
 </body>
 </html>
