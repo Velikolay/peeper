@@ -33,11 +33,16 @@ exports.search = function (req, res) {
 }
 
 var textSearch = function(phrase, res) {
-	tweetModel.textSearch("\"" + phrase + "\"", { filter: { delivered: true } }, function (err, data) {
+	tweetModel.textSearch("\"" + phrase + "\"", { filter: { delivered: true }, limit: 20 }, function (err, data) {
 		if (err) {
 			console.error(err);
 			res.send(500);
 		} else {
+			data.results.sort(function(a, b) {
+				var dateA = new Date(a.obj.created_at).getTime();
+				var dateB = new Date(b.obj.created_at).getTime();
+				return dateB - dateA;
+			});
 			res.render('index', { data: data, trackList: JSON.stringify([phrase])} );
 		}
 	});

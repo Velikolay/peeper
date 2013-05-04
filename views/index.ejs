@@ -36,7 +36,7 @@
 						</div>
 						<div class="row marginTop10">
 							<div class="progress span12">
-  								<div class="bar" style="width: <%= results[i].score * 100 %>%;"></div>
+  								<div class="bar" style="width: <%= results[i].score * 100 %>%;" title="<%= results[i].score * 100 %>%"></div>
 							</div>
 						</div>
 					</blockquote>
@@ -67,7 +67,8 @@
 								+	'</div>'
 								+	'<div class="row marginTop10">'
 								+		'<div class="progress span12">'
-								+			'<div class="bar" style="width: ' + (results[i].score * 100) + '%;"></div>'
+								+			'<div class="bar" style="width: ' + (results[i].score * 100) + '%;" title="'
+								+				(results[i].score * 100) + '%"></div>'
 								+		'</div>'
 								+	'</div>'
 								+'</blockquote>');
