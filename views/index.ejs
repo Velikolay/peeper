@@ -25,10 +25,19 @@
 				
 				<%	for(var i=0; i<results.length; i++) { %>
 					<blockquote>
-						<p><%= results[i].obj.text %></p>
-						<small><strong><%= results[i].obj.user %></strong> @ <%= results[i].obj.created_at %></small>
-						<div class="progress">
-  							<div class="bar" style="width: <%= results[i].score * 100 %>%;"></div>
+						<div class="row">
+							<div class="span1">
+								<img src="<%= results[i].obj.profile_image_url %>"></img>
+							</div>
+							<div class="span10">
+								<p><%= results[i].obj.text %></p>
+								<small><strong><%= results[i].obj.user %></strong> @ <%= results[i].obj.created_at %></small>
+							</div>
+						</div>
+						<div class="row marginTop10">
+							<div class="progress span12">
+  								<div class="bar" style="width: <%= results[i].score * 100 %>%;"></div>
+							</div>
 						</div>
 					</blockquote>
 				<% } %>
@@ -44,10 +53,11 @@
 						var results = data.results;
 						for(var i=0; i<results.length; i++) {
 							console.log(results[i]);
-							$('#tweets').prepend('<blockquote><p>' + results[i].obj.text + 
+							$('#tweets').prepend('<blockquote><div class="row"><div class="span1"><img src="' + results[i].obj.profile_image_url + '"></img></div><div class="span10"><p>'
+								+ results[i].obj.text + 
 								'</p><small><strong>' + results[i].obj.user + '</strong> @ ' + results[i].obj.created_at + 
-								'</small><div class="progress"><div class="bar" style="width: ' + results[i].score * 100 + 
-								'%;"></div></div></blockquote>');
+								'</small></div></div><div class="row marginTop10"><div class="progress span12"><div class="bar" style="width: ' + results[i].score * 100 + 
+								'%;"></div></div></div></blockquote>');
 							// var table = document.getElementById('resultsTable');
 							// var cell = table.insertRow(0).insertCell(0);
 							// cell.innerHTML = results[i].obj.text;

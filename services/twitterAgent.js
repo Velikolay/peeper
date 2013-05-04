@@ -51,7 +51,7 @@ module.exports.track = track = function(trackList) {
 			}
 			
 			sentiment.evalText(data.text, function (err, res) {
-				var obj = { _id: data.id, text: data.text, user: data.user.screen_name, created_at: data.created_at, sentiment: {} };
+				var obj = { _id: data.id, text: data.text, user: data.user.screen_name, created_at: data.created_at, sentiment: {}, profile_image_url:data.user.profile_image_url };
 				
 				if(err) {
 					console.error(err);

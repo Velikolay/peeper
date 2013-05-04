@@ -10,6 +10,7 @@ var tweetSchema = new Schema({
 	created_at: {type: Date, default: Date.now},
 	lang: {type: String, default: 'en'},
 	delivered: { type: Boolean, default: false},
+	profile_image_url: {type: String, default: '#'},
 	sentiment: { // neutral by default, or is it better if unset, so that the sentiment service can evaluate it when available again?
 		positive: {type: Number, default: 1},
 		negative: {type: Number, default: -1},
