@@ -17,7 +17,7 @@ var phraseType = function(phrase) {
 var trackList = function(data) {
 	var trackList=[];
 	for(var i=0; i<data.length; i++) {
-		trackList.push(data[i].actual);
+		trackList.push(data[i].text);
 	}
 	return trackList;
 }
@@ -29,7 +29,7 @@ module.exports.track = function(req, res) {
 		return;
 	}
 	
-	var phrase = new phraseModel({actual: newPhrase, type: phraseType(newPhrase)});
+	var phrase = new phraseModel({text: newPhrase, type: phraseType(newPhrase)});
 	phrase.save(function (err) {
 		if (err) {
 			if(err.code == 11000) {
@@ -43,7 +43,7 @@ module.exports.track = function(req, res) {
 		}
 		console.info('Added new phrase: ' + newPhrase);
 		// get all current phrases
-		phraseModel.find({}, 'actual', function(err, data) {
+		phraseModel.find({}, 'text', function(err, data) {
 			if(err) {
 				console.error(err);
 				res.send(500);
@@ -60,7 +60,7 @@ module.exports.track = function(req, res) {
 module.exports.untrack = function(req, res) {
 	var phrase = req.params.phrase;
 	
-	phraseModel.findOneAndRemove({actual: phrase}, function(err, data) {
+	phraseModel.findOneAndRemove({text: phrase}, function(err, data) {
 		if(err) {
 			console.error(err);
 			res.send(500);
@@ -74,7 +74,7 @@ module.exports.untrack = function(req, res) {
 		
 		console.info('Disabled tracking of ' + phrase);
 		// get all current phrases
-		phraseModel.find({}, 'actual', function(err, data) {
+		phraseModel.find({}, 'text', function(err, data) {
 			if(err) {
 				console.error(err);
 				res.send(500);

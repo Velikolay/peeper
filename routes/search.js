@@ -1,14 +1,15 @@
 var tweetModel = require('../models/tweetModel')
 	,phraseModel = require('../models/phraseModel')
-	,twitterAgent = require('../services/twitterAgent');
+	,twitterAgent = require('../services/twitterAgent')
+	,observerService = require('../services/observerService');
 
 exports.search = function (req, res) {
 	var phrase = req.query.phrase;
-	var newPhrase = new phraseModel({actual: phrase, type: phraseType(phrase)});
+	var newPhrase = new phraseModel({text: phrase, type: phraseType(phrase)});
 	newPhrase.save(function (err) {
 		if (err) {
 			if(err.code == 11000) {
-				textSearch(phrase, res);
+				textSearch(phrase, false, res);
 			} else {
 				console.error(err);
 				res.send(500);
@@ -17,7 +18,7 @@ exports.search = function (req, res) {
 		}
 		console.info('Added new phrase: ' + phrase);
 		// get all current phrases
-		phraseModel.find({}, 'actual', function(err, data) {
+		phraseModel.find({}, 'text', function(err, data) {
 			if(err) {
 				console.error(err);
 				res.send(500);
@@ -25,27 +26,51 @@ exports.search = function (req, res) {
 			}
 			// renew the list of phrases being tracked
 			twitterAgent.track(trackList(data));
+			observerService.keepUpdated(phrase);
 			// return results to the user and ensure that
 			// he will be recieving regular updates via websocket
-			textSearch(phrase, res);
+			textSearch(phrase, true, res)
 		});
 	});
 }
 
-var textSearch = function(phrase, res) {
-	tweetModel.textSearch("\"" + phrase + "\"", { filter: { delivered: true }, limit: 20 }, function (err, data) {
+var textSearch = function(phrase, firstSearch, res) {
+	tweetModel.textSearch("\"" + phrase + "\"", { filter: { processed: true }, limit: 40 }, function (err, data) {
 		if (err) {
 			console.error(err);
 			res.send(500);
-		} else {
-			data.results.sort(function(a, b) {
-				var dateA = new Date(a.obj.created_at).getTime();
-				var dateB = new Date(b.obj.created_at).getTime();
-				return dateB - dateA;
+			return;
+		}
+		
+		data.results.sort(byTweetDate);
+		if(firstSearch && data.results.length > 0) {
+			console.log("Initial aggregation of sentiment data for " + phrase);
+			phraseModel.findOne({text: phrase}, function(err, obj) {
+				if(err) {
+					console.error(err);
+					data.context = { text: phrase };
+					res.render('index', { data: data, trackList: JSON.stringify([phrase])} );
+					return;
+				}
+				obj.updateSentimentData(data.results, function(err) { // initial aggregation of sentiment data
+					if(err) {
+						console.error(err); //TODO add better error handling in future
+					}
+					data.context = obj;
+					res.render('index', { data: data, trackList: JSON.stringify([phrase])} );
+				}); 
 			});
+		} else {
+			data.context = { text: phrase };
 			res.render('index', { data: data, trackList: JSON.stringify([phrase])} );
 		}
 	});
+}
+
+var byTweetDate = function(a, b) {
+	var dateA = new Date(a.obj.created_at).getTime();
+	var dateB = new Date(b.obj.created_at).getTime();
+	return dateB - dateA;
 }
 
 var phraseType = function(phrase) {
@@ -63,7 +88,7 @@ var phraseType = function(phrase) {
 var trackList = function(data) {
 	var trackList=[];
 	for(var i=0; i<data.length; i++) {
-		trackList.push(data[i].actual);
+		trackList.push(data[i].text);
 	}
 	return trackList;
 }

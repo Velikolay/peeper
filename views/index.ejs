@@ -49,8 +49,8 @@
 				<script>
 					io = io.connect();
 					io.emit('track', {trackList: <%- trackList %>});
-					io.on('update', function(data) {
-						var results = data.results;
+					io.on('update', function(update) {
+						var results = update.data.results;
 						for(var i=0; i<results.length; i++) {
 							$('#tweets').prepend(
 								'<blockquote>'

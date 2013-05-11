@@ -12,7 +12,7 @@ var ntwitter = new twitter({
 });
 
 module.exports.init = function() {
-	phraseModel.find({}, 'actual', function(err, data) {
+	phraseModel.find({}, 'text', function(err, data) {
 		if(err) {
 			console.error(err);
 			process.exit(1);
@@ -25,7 +25,7 @@ module.exports.init = function() {
 		var trackList = function(data) {
 			var trackList=[];
 			for(var i=0; i<data.length; i++) {
-				trackList.push(data[i].actual);
+				trackList.push(data[i].text);
 			}
 			return trackList;
 		}
