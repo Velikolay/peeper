@@ -64,16 +64,18 @@ var observe = function() {
 						updateProcessed(results);
 						finalizeAndScheduleNextIterationIfNoMoreTasks(tasks);
 					} else {
-						obj.updateSentimentData(results, function(err) { // continuous aggregation of sentiment data
-							if(err) {
-								console.error(err); //TODO add error handling in future
-							}
-							data.context = obj;
-							console.info(data);
-							updateListeners(key, data);
-							updateProcessed(results);
-							finalizeAndScheduleNextIterationIfNoMoreTasks(tasks);
-						});
+						if(obj) {
+							obj.updateSentimentData(results, function(err) { // continuous aggregation of sentiment data
+								if(err) {
+									console.error(err); //TODO add error handling in future
+								}
+								data.context = obj;
+								console.info(data);
+								updateListeners(key, data);
+								updateProcessed(results);
+								finalizeAndScheduleNextIterationIfNoMoreTasks(tasks);
+							});
+						}
 					}
 				});
 			} else {
