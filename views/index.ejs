@@ -79,7 +79,10 @@
 								+		'</div>'
 								+	'</div>'
 								+'</blockquote>');
-							$('#tweets blockquote:last-child').remove();
+							var tweets = $('#tweets blockquote').length;
+							if(tweets > 40) {
+								$('#tweets blockquote:nth-last-child(-n+' + (tweets-40) + ')').remove();
+							}
 						}
 					});
 			<% } %>
