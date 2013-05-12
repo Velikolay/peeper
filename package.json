@@ -10,6 +10,7 @@
     "ejs": "*",
     "ntwitter" : "*",
     "mongoose":"*",
-    "mongoose-text-search":"*"
+    "mongoose-text-search":"*",
+    "quiche":"*"
   }
 }

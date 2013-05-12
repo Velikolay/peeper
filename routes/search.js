@@ -1,7 +1,8 @@
 var tweetModel = require('../models/tweetModel')
 	,phraseModel = require('../models/phraseModel')
 	,twitterAgent = require('../services/twitterAgent')
-	,observerService = require('../services/observerService');
+	,observerService = require('../services/observerService')
+	,Quiche = require('quiche');
 
 exports.search = function (req, res) {
 	var phrase = req.query.phrase;
@@ -49,7 +50,7 @@ var textSearch = function(phrase, firstSearch, res) {
 				if(err) {
 					console.error(err);
 					data.context = { text: phrase };
-					res.render('index', { data: data, trackList: JSON.stringify([phrase])} );
+					res.render('index', { data: data, trackList: JSON.stringify([phrase]), pieChartURL:null} );
 					return;
 				}
 				obj.updateSentimentData(data.results, function(err) { // initial aggregation of sentiment data
@@ -57,12 +58,31 @@ var textSearch = function(phrase, firstSearch, res) {
 						console.error(err); //TODO add better error handling in future
 					}
 					data.context = obj;
-					res.render('index', { data: data, trackList: JSON.stringify([phrase])} );
+					res.render('index', { data: data, trackList: JSON.stringify([phrase]), pieChartURL:null} );
 				}); 
 			});
 		} else {
-			data.context = { text: phrase };
-			res.render('index', { data: data, trackList: JSON.stringify([phrase])} );
+			phraseModel.findOne({text: phrase}, function(err, obj) {
+				if(err) {
+					console.error(err);
+				}
+				console.log(obj);
+				var imageUrl = null;
+				
+				if(obj != null) {
+					var pie = new Quiche('pie');
+					pie.setTransparentBackground(); // Make background transparent
+					pie.set3D();
+					pie.addData(obj.sentiment.totalPositive, 'Positive', '5EB95E');
+					pie.addData(obj.sentiment.totalNeutral, 'Neutral', '0e90d2');
+					pie.addData(obj.sentiment.totalNegative, 'Negative', 'DD514C');
+
+					var imageUrl = pie.getUrl(true);
+				}
+
+				data.context = { text: phrase };
+				res.render('index', { data: data, trackList: JSON.stringify([phrase]), pieChartURL:imageUrl} );
+			});
 		}
 	});
 }

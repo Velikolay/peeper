@@ -11,15 +11,22 @@
 	<script src="http://code.jquery.com/jquery.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<div class="container">
-		<div class="span12 marginTop20">
-			<div class="span12 text-center">
-				<form name="input" action="search" method="get" class="form-search">
-					<input type="search" placeholder="Search" name="phrase" class="input-medium">
-					<input type="submit" value="Search" class="btn">
-				</form>
+		<div class="span12">
+			<div class="row">
+				<div class="span9 text-center marginTop70">
+					<form name="input" action="search" method="get" class="form-search">
+						<input type="search" placeholder="Search" name="phrase" class="input-medium">
+						<input type="submit" value="Search" class="btn">
+					</form>
+				</div>
+				<% if(pieChartURL) {%>
+				<div class="span3">
+					<img src="<%= pieChartURL %>"></img>
+				</div>
+				<% } %>
 			</div>
 
-			<div id="tweets" class="span12">
+			<div id="tweets" class="span12 marginTop40">
 			<% if(data.results && data.results.length > 0) { 
 				var results = data.results;	%>
 				
@@ -72,6 +79,7 @@
 								+		'</div>'
 								+	'</div>'
 								+'</blockquote>');
+							$('#tweets blockquote:last-child').remove();
 						}
 					});
 			<% } %>

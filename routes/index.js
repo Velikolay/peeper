@@ -4,5 +4,5 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', { data: {}, trackList: false });
+  res.render('index', { data: {}, trackList: false, pieChartURL:null });
 };
