@@ -9,6 +9,7 @@
 </head>
 <body>
 	<script src="http://code.jquery.com/jquery.js"></script>
+	<script src="js/jquery.color-2.1.2.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<div class="container">
 		<div class="span12">
@@ -42,7 +43,7 @@
 							</div>
 						</div>
 						<div class="row marginTop10">
-							<div class="progress span12">
+							<div class="progress span11">
   								<div class="bar" style="width: <%= results[i].score * 100 %>%;" title="<%= results[i].score * 100 %>%"></div>
 							</div>
 						</div>
@@ -60,7 +61,7 @@
 						var results = update.data.results;
 						for(var i=0; i<results.length; i++) {
 							$('#tweets').prepend(
-								'<blockquote>'
+								'<blockquote class="greyBack">'
 								+	'<div class="row">'
 								+		'<div class="span1">'
 								+			'<img src="' + results[i].obj.profile_image_url + '"></img>'
@@ -73,7 +74,7 @@
 								+		'</div>'
 								+	'</div>'
 								+	'<div class="row marginTop10">'
-								+		'<div class="progress span12">'
+								+		'<div class="progress span11">'
 								+			'<div class="bar" style="width: ' + (results[i].score * 100) + '%;" title="'
 								+				(results[i].score * 100) + '%"></div>'
 								+		'</div>'
@@ -83,6 +84,9 @@
 							if(tweets > 40) {
 								$('#tweets blockquote:nth-last-child(-n+' + (tweets-40) + ')').remove();
 							}
+							setTimeout(function() {
+								$('.greyBack').animate({ backgroundColor: "#ffffff" }, 'slow').removeClass('greyBack');
+							}, 3000);
 						}
 					});
 			<% } %>
