@@ -97,7 +97,7 @@ var textSearch = function(phrase, firstSearch, res) {
 					var x = [];
 					for(var i=1; i<32; ++i) {
 						x.push(i);
-						if(obj.sentiment.dateAnalysis[i]) {
+						if(obj.sentiment && obj.sentiment.dateAnalysis && obj.sentiment.dateAnalysis[i]) {
 							positive.push(obj.sentiment.dateAnalysis[i].totalPositive);
 							neutral.push(obj.sentiment.dateAnalysis[i].totalNeutral);
 							negative.push(obj.sentiment.dateAnalysis[i].totalNegative);
