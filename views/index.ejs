@@ -20,14 +20,21 @@
 						<input type="submit" value="Search" class="btn">
 					</form>
 				</div>
-				<% if(pieChartURL) {%>
-				<div class="span3">
-					<img src="<%= pieChartURL %>"></img>
-				</div>
-				<% } %>
 			</div>
+			<% if(charts) {%>
+				<div class="row marginTop40">
+					<div class="span12 text-center">
+						<img src="<%= charts.pieChart %>"></img>
+					</div>
+				</div>
+				<div class="row marginTop40">
+					<div class="span12 text-center">
+						<img src="<%= charts.barChart %>"></img>
+					</div>
+				</div>
+			<% } %>
 
-			<div id="tweets" class="span12 marginTop40">
+			<div id="tweets" class="span12 marginTop70">
 			<% if(data.results && data.results.length > 0) { 
 				var results = data.results;	%>
 				

@@ -50,7 +50,7 @@ var textSearch = function(phrase, firstSearch, res) {
 				if(err) {
 					console.error(err);
 					data.context = { text: phrase };
-					res.render('index', { data: data, trackList: JSON.stringify([phrase]), pieChartURL:null} );
+					res.render('index', { data: data, trackList: JSON.stringify([phrase]), charts:null} );
 					return;
 				}
 				obj.updateSentimentData(data.results, function(err) { // initial aggregation of sentiment data
@@ -58,7 +58,7 @@ var textSearch = function(phrase, firstSearch, res) {
 						console.error(err); //TODO add better error handling in future
 					}
 					data.context = obj;
-					res.render('index', { data: data, trackList: JSON.stringify([phrase]), pieChartURL:null} );
+					res.render('index', { data: data, trackList: JSON.stringify([phrase]), charts:null} );
 				}); 
 			});
 		} else {
@@ -67,21 +67,58 @@ var textSearch = function(phrase, firstSearch, res) {
 					console.error(err);
 				}
 				console.log(obj);
-				var imageUrl = null;
+				var charts = {};
 				
 				if(obj != null) {
+					var total = obj.sentiment.totalPositive + obj.sentiment.totalNeutral + obj.sentiment.totalNegative;
 					var pie = new Quiche('pie');
-					pie.setTransparentBackground(); // Make background transparent
+					pie.setTitle('Total');
+					pie.setWidth(700);
+					pie.setTransparentBackground();
 					pie.set3D();
 					pie.addData(obj.sentiment.totalPositive, 'Positive', '5EB95E');
 					pie.addData(obj.sentiment.totalNeutral, 'Neutral', '0e90d2');
 					pie.addData(obj.sentiment.totalNegative, 'Negative', 'DD514C');
+					pie.setLegendHidden();
+					pie.addAxisLabels('x', ['Positive ' + (obj.sentiment.totalPositive/total*100).toFixed(2) + '%', 
+						'Neutral ' + (obj.sentiment.totalNeutral/total*100).toFixed(2) + '%',
+						'Negative ' + (obj.sentiment.totalNegative/total*100).toFixed(2) + '%']);
 
-					var imageUrl = pie.getUrl(true);
+					var bar = new Quiche('bar');
+					bar.setWidth(700);
+					bar.setTitle('Day by day statistic');
+					bar.setLegendBottom();
+					bar.setBarStacked();
+					bar.setTransparentBackground();
+					bar.setAutoScaling();
+					var positive = [];
+					var neutral = [];
+					var negative = [];
+					var x = [];
+					for(var i=1; i<32; ++i) {
+						x.push(i);
+						if(obj.sentiment.dateAnalysis[i]) {
+							positive.push(obj.sentiment.dateAnalysis[i].totalPositive);
+							neutral.push(obj.sentiment.dateAnalysis[i].totalNeutral);
+							negative.push(obj.sentiment.dateAnalysis[i].totalNegative);
+						} else {
+							positive.push(0);
+							neutral.push(0);
+							negative.push(0);
+						}
+					}
+					bar.addData(positive, 'Positive', '5EB95E');
+					bar.addData(neutral, 'Neutral', '0e90d2');
+					bar.addData(negative, 'Negative', 'DD514C');
+
+					bar.addAxisLabels('x', x);
+
+					charts.pieChart = pie.getUrl(true);
+					charts.barChart = bar.getUrl(true);
 				}
 
 				data.context = { text: phrase };
-				res.render('index', { data: data, trackList: JSON.stringify([phrase]), pieChartURL:imageUrl} );
+				res.render('index', { data: data, trackList: JSON.stringify([phrase]), charts:charts} );
 			});
 		}
 	});
