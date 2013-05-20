@@ -24,12 +24,12 @@
 			<% if(charts) {%>
 				<div class="row marginTop40">
 					<div class="span12 text-center">
-						<img src="<%= charts.pieChart %>"></img>
+						<img id="pieChart" src="<%= charts.pieChart %>"></img>
 					</div>
 				</div>
 				<div class="row marginTop40">
 					<div class="span12 text-center">
-						<img src="<%= charts.barChart %>"></img>
+						<img id="barChart" src="<%= charts.barChart %>"></img>
 					</div>
 				</div>
 			<% } %>
@@ -66,6 +66,8 @@
 					io.emit('track', {trackList: <%- trackList %>});
 					io.on('update', function(update) {
 						var results = update.data.results;
+						$('#pieChart').attr('src', update.charts.pieChart);
+						$('#barChart').attr('src', update.charts.barChart);
 						for(var i=0; i<results.length; i++) {
 							$('#tweets').prepend(
 								'<blockquote class="greyBack">'

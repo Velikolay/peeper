@@ -51,7 +51,8 @@ app.io.route('track', function(req) {
 			// store data in the user session in order to offload the observerService
 			// from obsolate phrases when the user disconnects or no longer monitors them.
 			console.log("new tweets received for " + phrase);
-			req.io.emit('update', {phrase: phrase, data: data});
+      var charts = search.getCharts(data.context.sentiment);
+			req.io.emit('update', {phrase: phrase, data: data, charts: charts});
 		});
 	}
 });

@@ -70,51 +70,7 @@ var textSearch = function(phrase, firstSearch, res) {
 				var charts = {};
 				
 				if(obj != null) {
-					var total = obj.sentiment.totalPositive + obj.sentiment.totalNeutral + obj.sentiment.totalNegative;
-					var pie = new Quiche('pie');
-					pie.setTitle('Total');
-					pie.setWidth(700);
-					pie.setTransparentBackground();
-					pie.set3D();
-					pie.addData(obj.sentiment.totalPositive, 'Positive', '5EB95E');
-					pie.addData(obj.sentiment.totalNeutral, 'Neutral', '0e90d2');
-					pie.addData(obj.sentiment.totalNegative, 'Negative', 'DD514C');
-					pie.setLegendHidden();
-					pie.addAxisLabels('x', ['Positive ' + (obj.sentiment.totalPositive/total*100).toFixed(2) + '%', 
-						'Neutral ' + (obj.sentiment.totalNeutral/total*100).toFixed(2) + '%',
-						'Negative ' + (obj.sentiment.totalNegative/total*100).toFixed(2) + '%']);
-
-					var bar = new Quiche('bar');
-					bar.setWidth(700);
-					bar.setTitle('Day by day statistic');
-					bar.setLegendBottom();
-					bar.setBarStacked();
-					bar.setTransparentBackground();
-					bar.setAutoScaling();
-					var positive = [];
-					var neutral = [];
-					var negative = [];
-					var x = [];
-					for(var i=1; i<32; ++i) {
-						x.push(i);
-						if(obj.sentiment && obj.sentiment.dateAnalysis && obj.sentiment.dateAnalysis[i]) {
-							positive.push(obj.sentiment.dateAnalysis[i].totalPositive);
-							neutral.push(obj.sentiment.dateAnalysis[i].totalNeutral);
-							negative.push(obj.sentiment.dateAnalysis[i].totalNegative);
-						} else {
-							positive.push(0);
-							neutral.push(0);
-							negative.push(0);
-						}
-					}
-					bar.addData(positive, 'Positive', '5EB95E');
-					bar.addData(neutral, 'Neutral', '0e90d2');
-					bar.addData(negative, 'Negative', 'DD514C');
-
-					bar.addAxisLabels('x', x);
-
-					charts.pieChart = pie.getUrl(true);
-					charts.barChart = bar.getUrl(true);
+					charts = getCharts(obj.sentiment);
 				}
 
 				data.context = { text: phrase };
@@ -122,6 +78,58 @@ var textSearch = function(phrase, firstSearch, res) {
 			});
 		}
 	});
+}
+
+exports.getCharts = getCharts = function(sentiment) {
+	var total = sentiment.totalPositive + sentiment.totalNeutral + sentiment.totalNegative;
+	var pie = new Quiche('pie');
+	pie.setTitle('Total');
+	pie.setWidth(700);
+	pie.setTransparentBackground();
+	pie.set3D();
+	pie.addData(sentiment.totalPositive, 'Positive', '5EB95E');
+	pie.addData(sentiment.totalNeutral, 'Neutral', '0e90d2');
+	pie.addData(sentiment.totalNegative, 'Negative', 'DD514C');
+	pie.setLegendHidden();
+	pie.addAxisLabels('x', ['Positive ' + (sentiment.totalPositive/total*100).toFixed(2) + '%', 
+		'Neutral ' + (sentiment.totalNeutral/total*100).toFixed(2) + '%',
+		'Negative ' + (sentiment.totalNegative/total*100).toFixed(2) + '%']);
+
+	var bar = new Quiche('bar');
+	bar.setWidth(700);
+	bar.setTitle('Day by day statistic');
+	bar.setLegendBottom();
+	bar.setBarStacked();
+	bar.setTransparentBackground();
+	bar.setAutoScaling();
+	var positive = [];
+	var neutral = [];
+	var negative = [];
+	var x = [];
+	for(var i=1; i<32; ++i) {
+		x.push(i);
+		if(sentiment && sentiment.dateAnalysis && sentiment.dateAnalysis[i]) {
+			positive.push(sentiment.dateAnalysis[i].totalPositive);
+			neutral.push(sentiment.dateAnalysis[i].totalNeutral);
+			negative.push(sentiment.dateAnalysis[i].totalNegative);
+		} else {
+			positive.push(0);
+			neutral.push(0);
+			negative.push(0);
+		}
+	}
+	bar.addData(positive, 'Positive', '5EB95E');
+	bar.addData(neutral, 'Neutral', '0e90d2');
+	bar.addData(negative, 'Negative', 'DD514C');
+
+	bar.addAxisLabels('x', x);
+
+	var charts = {
+		pieChart : pie.getUrl(true),
+		barChart : bar.getUrl(true)
+	};
+
+	return charts;
 }
 
 var byTweetDate = function(a, b) {
