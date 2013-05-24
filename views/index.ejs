@@ -21,7 +21,7 @@
 					</form>
 				</div>
 			</div>
-			<% if(charts) {%>
+			<% if(charts && charts.pieChart && charts.barChart) {%>
 				<div class="row marginTop40">
 					<div class="span12 text-center">
 						<img id="pieChart" src="<%= charts.pieChart %>"></img>
