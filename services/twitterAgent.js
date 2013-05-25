@@ -36,7 +36,7 @@ module.exports.init = function() {
 
 module.exports.track = track = function(trackList) {
 	console.info("Refreshing the track list! The list contains: " + trackList);
-	ntwitter.stream('statuses/filter', { 'track': trackList, 'filter_level': 'medium', 'language': 'en' }, function(stream) {
+	ntwitter.stream('statuses/filter', { 'track': trackList, 'filter_level': 'low', 'language': 'en' }, function(stream) {
 		
 		if(trackList.length == 0) {
 			// TODO it doesn`t seem to work :( I guess the damn API doesn`t fire the 'end' event.
@@ -63,7 +63,7 @@ module.exports.track = track = function(trackList) {
 				var tweet = new tweetModel(obj);
 				tweet.save(function (err) {
 					if (err) console.error(err);
-					//console.log(tweet);
+					console.log(tweet);
 				});
 			});
 		});
