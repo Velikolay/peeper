@@ -38,8 +38,16 @@
 			<% if(data.results && data.results.length > 0) { 
 				var results = data.results;	%>
 				
-				<%	for(var i=0; i<results.length; i++) { %>
-					<blockquote>
+				<%	for(var i=0; i<results.length; i++) { 
+					var borderColor = '200, 200, 200';
+					if(data.results[i].obj.sentiment.polarity == 1)
+						borderColor = '94, 185, 94';
+					else if(data.results[i].obj.sentiment.polarity == 0)
+						borderColor = '14, 144, 210';
+					else
+						borderColor = '221, 81, 76';
+					%>
+					<blockquote style="border-left-color: rgb(<%= borderColor %>)">
 						<div class="row">
 							<div class="span1">
 								<img src="<%= results[i].obj.profile_image_url %>"></img>
@@ -51,7 +59,7 @@
 						</div>
 						<div class="row marginTop10">
 							<div class="progress span11">
-  								<div class="bar" style="width: <%= results[i].score * 100 %>%;" title="<%= results[i].score * 100 %>%"></div>
+  								<div class="bar" style="width: <%= results[i].score * 100 %>%;"><%= (results[i].score * 100).toFixed(2) %>% relevance</div>
 							</div>
 						</div>
 					</blockquote>
@@ -69,8 +77,12 @@
 						$('#pieChart').attr('src', update.charts.pieChart);
 						$('#barChart').attr('src', update.charts.barChart);
 						for(var i=0; i<results.length; i++) {
+							var polarity = results[i].obj.sentiment.polarity;
+							if(polarity == 1) polarity = 'polarityPositive';
+							else if(polarity == 0) polarity = 'polarityNeutral';
+							else polarity = 'polarityNegative';
 							$('#tweets').prepend(
-								'<blockquote class="greyBack">'
+								'<blockquote class="greyBack ' + polarity + '">'
 								+	'<div class="row">'
 								+		'<div class="span1">'
 								+			'<img src="' + results[i].obj.profile_image_url + '"></img>'
@@ -84,8 +96,8 @@
 								+	'</div>'
 								+	'<div class="row marginTop10">'
 								+		'<div class="progress span11">'
-								+			'<div class="bar" style="width: ' + (results[i].score * 100) + '%;" title="'
-								+				(results[i].score * 100) + '%"></div>'
+								+			'<div class="bar" style="width: ' + (results[i].score * 100) + '%;" >'
+								+ 				(results[i].score * 100).toFixed(2) +'% relevance</div>'
 								+		'</div>'
 								+	'</div>'
 								+'</blockquote>');
@@ -95,7 +107,12 @@
 							}
 							setTimeout(function() {
 								$('.greyBack').animate({ backgroundColor: "#ffffff" }, 'slow').removeClass('greyBack');
-							}, 3000);
+							}, 5000);
+							setTimeout(function() {
+								$('.polarityPositive').animate({borderLeftColor: "#5EB95E"}, 'slow').removeClass('polarityPositive');
+								$('.polarityNeutral').animate({borderLeftColor: "#0e90d2"}, 'slow').removeClass('polarityNeutral');
+								$('.polarityNegative').animate({borderLeftColor: "#DD514C"}, 'slow').removeClass('polarityNegative');
+							}, 1000);
 						}
 					});
 			<% } %>
