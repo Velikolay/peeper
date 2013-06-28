@@ -83,7 +83,7 @@ var textSearch = function(phrase, firstSearch, res) {
 exports.getCharts = getCharts = function(sentiment) {
 	var total = sentiment.totalPositive + sentiment.totalNeutral + sentiment.totalNegative;
 	var pie = new Quiche('pie');
-	pie.setTitle('Total');
+	pie.setTitle('Total: ' + total);
 	pie.setWidth(700);
 	pie.setTransparentBackground();
 	pie.set3D();
